@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>邮件线程重建台</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>📧 邮件线程重建台</h1>
+  <p class="subtitle">按 Message-ID / In-Reply-To / References 重建会话树 · 缺失父节点占位 · 循环引用自动断开</p>
+</header>
+
+{% macro node_html(node) %}
+<li class="node{% if node.placeholder %} placeholder{% endif %}{% if node.cycle_broken %} cycle{% endif %}">
+  {% if node.children %}
+  <details open>
+    <summary>
+      <span class="toggle" aria-hidden="true"></span>
+      {% if node.placeholder %}
+        <span class="badge badge-missing">占位根 · 缺失邮件</span>
+        <span class="subject missing">&lt;{{ node.message_id }}&gt;</span>
+      {% else %}
+        <span class="subject">{{ node.subject }}</span>
+        <span class="sender">{{ node.sender }}</span>
+        <time>{{ node.date or "未知时间" }}</time>
+      {% endif %}
+      {% if node.cycle_broken %}
+        <span class="badge badge-cycle" title="检测到与 &lt;{{ node.cycle_target }}&gt; 的循环引用，已断开该边">⚠ 循环已断开</span>
+      {% endif %}
+      <span class="count">{{ node.children|length }} 封回复</span>
+    </summary>
+    <ul class="tree">
+      {% for child in node.children %}{{ node_html(child) }}{% endfor %}
+    </ul>
+  </details>
+  {% else %}
+  <div class="leaf">
+    {% if node.placeholder %}
+      <span class="badge badge-missing">占位 · 缺失邮件</span>
+      <span class="subject missing">&lt;{{ node.message_id }}&gt;</span>
+    {% else %}
+      <span class="subject">{{ node.subject }}</span>
+      <span class="sender">{{ node.sender }}</span>
+      <time>{{ node.date or "未知时间" }}</time>
+    {% endif %}
+    {% if node.cycle_broken %}
+      <span class="badge badge-cycle" title="检测到与 &lt;{{ node.cycle_target }}&gt; 的循环引用，已断开该边">⚠ 循环已断开</span>
+    {% endif %}
+  </div>
+  {% endif %}
+</li>
+{% endmacro %}
+
+<main>
+  <section class="toolbar card">
+    <form action="/import" method="post" enctype="multipart/form-data" class="import-form">
+      <label class="file-label">
+        选择 .eml 文件（可多选）
+        <input type="file" name="files" accept=".eml,.txt,message/rfc822" multiple required>
+      </label>
+      <button type="submit" class="btn">导入邮件</button>
+    </form>
+    <form action="/import-sample" method="post">
+      <button type="submit" class="btn btn-secondary">载入示例数据</button>
+    </form>
+    <form action="/clear" method="post" onsubmit="return confirm('确定清空所有邮件？');">
+      <button type="submit" class="btn btn-danger">清空</button>
+    </form>
+  </section>
+
+  {% if request.query_params.get('imported') %}
+  <p class="notice">✅ 成功导入 {{ request.query_params.get('imported') }} 封邮件</p>
+  {% endif %}
+
+  <section class="stats">
+    <div class="stat"><b>{{ stats.total }}</b><span>邮件总数</span></div>
+    <div class="stat"><b>{{ stats.threads }}</b><span>会话线程</span></div>
+    <div class="stat"><b>{{ stats.placeholders }}</b><span>占位节点</span></div>
+    <div class="stat"><b>{{ stats.cycles }}</b><span>断开的循环</span></div>
+    <div class="stat"><b>{{ stats.orphans }}</b><span>孤立邮件</span></div>
+  </section>
+
+  <nav class="tabs">
+    <a href="/?view=threads" class="{{ 'active' if view != 'orphans' }}">全部线程</a>
+    <a href="/?view=orphans" class="{{ 'active' if view == 'orphans' }}">孤立邮件 ({{ stats.orphans }})</a>
+  </nav>
+
+  {% if view == 'orphans' %}
+    {% if orphans %}
+    <p class="hint">孤立邮件：既不引用其他邮件、也未被任何邮件引用的单封邮件。</p>
+    <table class="orphan-table">
+      <thead><tr><th>主题</th><th>发件人</th><th>时间</th><th>Message-ID</th></tr></thead>
+      <tbody>
+        {% for m in orphans %}
+        <tr>
+          <td>{{ m.subject }}</td>
+          <td>{{ m.sender }}</td>
+          <td><time>{{ m.date or "未知时间" }}</time></td>
+          <td><code>&lt;{{ m.message_id }}&gt;</code></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty">没有孤立邮件。</p>
+    {% endif %}
+  {% else %}
+    {% if roots %}
+    <ul class="tree root-tree">
+      {% for root in roots %}{{ node_html(root) }}{% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty">暂无邮件。请上传 .eml 文件或点击「载入示例数据」。</p>
+    {% endif %}
+  {% endif %}
+</main>
+</body>
+</html>

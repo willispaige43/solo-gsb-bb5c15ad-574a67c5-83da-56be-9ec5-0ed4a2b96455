@@ -1,0 +1,9 @@
+Message-ID: <loop-a@example.com>
+Subject: 服务器告警确认
+From: Ops <ops@example.com>
+Date: Wed, 17 Sep 2026 08:00:00 +0800
+In-Reply-To: <loop-b@example.com>
+References: <loop-b@example.com>
+Content-Type: text/plain; charset=utf-8
+
+告警已确认。（此邮件与 loop-b 互相引用，构成循环）
