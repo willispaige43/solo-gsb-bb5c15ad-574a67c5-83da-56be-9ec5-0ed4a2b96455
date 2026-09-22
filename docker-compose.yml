@@ -1,0 +1,12 @@
+services:
+  thread-bench:
+    build: .
+    container_name: email-thread-bench
+    ports:
+      - "8000:8000"
+    volumes:
+      - email-data:/data
+    restart: unless-stopped
+
+volumes:
+  email-data:

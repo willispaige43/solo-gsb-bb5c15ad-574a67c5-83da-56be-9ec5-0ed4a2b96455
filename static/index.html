@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>邮件线程重建台</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>📧 邮件线程重建台</h1>
+  <div class="actions">
+    <button id="btn-import" class="primary">导入邮件</button>
+    <button id="btn-refresh">刷新</button>
+    <button id="btn-clear" class="danger">清空</button>
+  </div>
+</header>
+
+<section class="toolbar">
+  <div class="filters" id="filters">
+    <label><input type="radio" name="filter" value="all" checked> 全部线程</label>
+    <label><input type="radio" name="filter" value="orphans"> 仅孤立邮件</label>
+    <label><input type="radio" name="filter" value="cycles"> 含循环引用</label>
+    <label><input type="radio" name="filter" value="placeholders"> 含缺失占位</label>
+  </div>
+  <div class="stats" id="stats"></div>
+</section>
+
+<main id="thread-container" class="threads">
+  <p class="empty">暂无数据，点击右上角「导入邮件」开始。</p>
+</main>
+
+<!-- 导入弹窗 -->
+<div id="import-modal" class="modal hidden">
+  <div class="modal-body">
+    <h2>导入 RFC822 邮件元数据</h2>
+    <p class="hint">支持单封 RFC822、mbox 拼接或多封邮件直接拼接；必须包含 Message-ID 头。</p>
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="file-input" hidden>
+      <p>点击选择文件，或将文件拖拽到此处</p>
+      <p id="file-name" class="filename"></p>
+    </div>
+    <p class="divider">也可直接粘贴原始邮件头文本：</p>
+    <textarea id="raw-input" rows="10"
+      placeholder="Message-ID: &lt;a@x&gt;&#10;Subject: ...&#10;In-Reply-To: &lt;b@x&gt;&#10;References: &lt;b@x&gt;&#10;Date: Mon, 22 Sep 2026 10:00:00 +0800&#10;From: alice@example.com"></textarea>
+    <p id="import-error" class="error"></p>
+    <div class="modal-actions">
+      <button id="btn-import-cancel">取消</button>
+      <button id="btn-import-submit" class="primary">导入并重建</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

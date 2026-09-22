@@ -1,0 +1,84 @@
+# mbox 风格示例：包含正常线程、缺失父节点、循环引用与孤立邮件
+# 可在页面「导入邮件」中直接上传本文件。
+
+From alice Mon Sep 21 09:00:00 2026
+Message-ID: <kickoff@example.com>
+Subject: 项目启动会
+Date: Mon, 21 Sep 2026 09:00:00 +0800
+From: Alice <alice@example.com>
+
+大家好，本周四召开项目启动会。
+
+From bob Mon Sep 21 10:30:00 2026
+Message-ID: <agree@example.com>
+Subject: Re: 项目启动会
+In-Reply-To: <kickoff@example.com>
+References: <kickoff@example.com>
+Date: Mon, 21 Sep 2026 10:30:00 +0800
+From: Bob <bob@example.com>
+
+收到，准时参加。
+
+From carol Mon Sep 21 11:15:00 2026
+Message-ID: <room@example.com>
+Subject: Re: 项目启动会
+In-Reply-To: <agree@example.com>
+References: <kickoff@example.com> <agree@example.com>
+Date: Mon, 21 Sep 2026 11:15:00 +0800
+From: Carol <carol@example.com>
+
+会议室订在 3F-301。
+
+From dave Mon Sep 21 14:00:00 2026
+Message-ID: <reply-ghost@example.com>
+Subject: Re: 一份缺失的历史邮件
+In-Reply-To: <vanished@example.com>
+References: <vanished@example.com>
+Date: Mon, 21 Sep 2026 14:00:00 +0800
+From: Dave <dave@example.com>
+
+我在回复一封系统里不存在的邮件，它将显示为占位根。
+
+From erin Mon Sep 21 15:00:00 2026
+Message-ID: <loop-a@example.com>
+Subject: 循环引用 A
+In-Reply-To: <loop-b@example.com>
+References: <loop-b@example.com>
+Date: Mon, 21 Sep 2026 15:00:00 +0800
+From: Erin <erin@example.com>
+
+A 回复 B。
+
+From frank Mon Sep 21 15:05:00 2026
+Message-ID: <loop-b@example.com>
+Subject: Re: 循环引用 A
+In-Reply-To: <loop-a@example.com>
+References: <loop-a@example.com>
+Date: Mon, 21 Sep 2026 15:05:00 +0800
+From: Frank <frank@example.com>
+
+B 又回复 A，形成环；系统会断开一条边并标记。
+
+From grace Mon Sep 21 16:00:00 2026
+Message-ID: <standalone@example.com>
+Subject: 一封孤立邮件
+Date: Mon, 21 Sep 2026 16:00:00 +0800
+From: Grace <grace@example.com>
+
+没有任何引用头，也没有同主题邮件，可通过「仅孤立邮件」筛选。
+
+From henry Mon Sep 21 17:00:00 2026
+Message-ID: <same-subject-1@example.com>
+Subject: 周五聚餐
+Date: Mon, 21 Sep 2026 17:00:00 +0800
+From: Henry <henry@example.com>
+
+周五有人一起吃火锅吗？
+
+From iris Mon Sep 21 08:30:00 2026
+Message-ID: <same-subject-2@example.com>
+Subject: re: 周五聚餐
+Date: Mon, 21 Sep 2026 08:30:00 +0800
+From: Iris <iris@example.com>
+
+同主题且无引用头的散落邮件会被归并到最早的一封（本条时间更早）。
